@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const fileController = require('./../controllers/fileController')
+const express = require('express');
+const router = express.Router();
+const multerMiddleware = require('../middleware/multer')
+const { postFile , getUploadPage} = require('../controllers/fileController.js')
 
-router.route("/upload").post(fileController.uploadFile);
+router.route('/upload').get(getUploadPage).post(multerMiddleware.multerMiddleware, postFile);
 
-modules.export = router;
+module.exports = router;

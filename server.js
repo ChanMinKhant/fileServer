@@ -4,7 +4,7 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/file", require('./routes/fileRoutes.js'));
+app.use('/', require('./routes/fileRoutes.js'));
 
 app.all("");
 const port = process.env.PORT || 3000;
