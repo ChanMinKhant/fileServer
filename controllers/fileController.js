@@ -1,6 +1,7 @@
 const File = require('./../models/File')
 const path = require('path')
 const multer = require('multer')
+const shortid = require('shortid')
 
 exports.getUploadPage = async (req, res, next) => {
   res.sendFile(path.join(__dirname, '../views/index.html'));
@@ -39,20 +40,21 @@ exports.postFile = async (req, res, next) => {
     }
 
 
-    const uniqueFilename = req.uniqueFilename;
+    // const uniqueFilename = req.uniqueFilename;
     //console.log('Unique Filename:', uniqueFilename);
     //console.log('Original Filename:', req.file.originalname);
    
-
+    const shortId = shortid.generate();
     const file = new File({
+      shortId: shortId,
       filePath: req.uniqueFilename,
       originalName:req.file.originalname
     })
     
-    file.save().then(doc=> console.log("file uploaded")).catch(err=> console.log(err));
+    file.save().then().catch(err=> console.log(err));
   
   
-   const downloadLink = `${req.protocol}://${req.get('host')}/get/${file.shortId}`;
+   const downloadLink = `${req.protocol}://${req.get('host')}/get/${shortId}`;
    
      res.render('Successful', { 
        message: 'File uploaded successfully.',

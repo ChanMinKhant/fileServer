@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const shortid = require('shortid')
+
 
 const FileSchema = new mongoose.Schema({
   shortId: {
     type: String,
-    default: shortid.generate(),
+    //default: shortid.generate(),
     unique: true,
   },
   filePath: {
