@@ -1,4 +1,3 @@
-const User = require('./../models/User')
 const File = require('./../models/File')
 const path = require('path')
 const multer = require('multer')
@@ -41,8 +40,8 @@ exports.postFile = async (req, res, next) => {
 
 
     const uniqueFilename = req.uniqueFilename;
-    console.log('Unique Filename:', uniqueFilename);
-    console.log('Original Filename:', req.file.originalname);
+    //console.log('Unique Filename:', uniqueFilename);
+    //console.log('Original Filename:', req.file.originalname);
    
 
     const file = new File({
@@ -50,10 +49,10 @@ exports.postFile = async (req, res, next) => {
       originalName:req.file.originalname
     })
     
-    file.save().then(doc=>console.log(doc)).catch(err=> console.log(err));
+    file.save().then(doc=> console.log("file uploaded")).catch(err=> console.log(err));
   
   
-   const downloadLink = `${req.protocol}://${req.get('host')}/download/${file.shortId}`;
+   const downloadLink = `${req.protocol}://${req.get('host')}/get/${file.shortId}`;
    
      res.render('Successful', { 
        message: 'File uploaded successfully.',
