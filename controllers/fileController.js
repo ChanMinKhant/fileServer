@@ -1,26 +1,66 @@
-//const asyncHandller = require ('express-async-handller');
+const User = require('./../models/User')
+const File = require('./../models/File')
 const path = require('path')
+const multer = require('multer')
 
-exports.getUploadPage = (req, res, next) => {
+exports.getUploadPage = async (req, res, next) => {
   res.sendFile(path.join(__dirname, '../views/index.html'));
+
 }
 
+exports.getDownloadPage = async (req, res, next) => {
+  try{
+  const shortId = req.params.id;
+  const file = await File.findOne({shortId})
+  res.render('download',{shortId,filename: file.originalName
+  })
+  }
+ catch{
+   res.render('404')
+ }
+}
+
+exports.downloadFile =async (req, res, next) => {
+  try{
+  const file= await File.findOne({shortId:req.params.id})
+  res.download(`./uploads/${file.filePath}`, file.originalName);
+  }
+  catch{
+    res.render('404');
+  }
+};
 
 
-exports.postFile = (req, res, next) => {
+
+
+exports.postFile = async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded.' });
     }
-    res.json({ message: 'File uploaded successfully.' });
+
+
+    const uniqueFilename = req.uniqueFilename;
+    console.log('Unique Filename:', uniqueFilename);
+    console.log('Original Filename:', req.file.originalname);
+   
+
+    const file = new File({
+      filePath: req.uniqueFilename,
+      originalName:req.file.originalname
+    })
+    
+    file.save().then(doc=>console.log(doc)).catch(err=> console.log(err));
+  
+  
+   const downloadLink = `${req.protocol}://${req.get('host')}/download/${file.shortId}`;
+   
+     res.render('Successful', { 
+       message: 'File uploaded successfully.',
+       Link: downloadLink
+     });
+     
   } catch (err) {
-    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-      // Multer error for exceeding file size limit
-      return res.status(400).json({ error: 'File size exceeds the limit (20 MB).' });
-    }
-
-    // Handle any other error that occurred during file upload
-    res.status(500).json({ error: 'An error occurred during file upload.' });
+    res.render('uploadError', { error: 'OTHER_ERROR' });
   }
-};
-
+}

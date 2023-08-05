@@ -1,11 +1,13 @@
 const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    req.uniqueFilename = `${uuidv4()}${file.originalname.substring(file.originalname.lastIndexOf('.'))}`;
+    cb(null, req.uniqueFilename);
   }
 });
 
@@ -19,11 +21,11 @@ const upload = multer({
 exports.multerMiddleware = (req, res, next) => {
   upload.single('file')(req, res, (err) => {
     if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'File size exceeds the limit (20 MB).' });
+      return res.status(400).render('uploadError', { error: 'LIMIT_FILE_SIZE' });
     }
 
     if (err) {
-      return res.status(500).json({ error: 'An error occurred during file upload.' });
+      return res.status(500).render('uploadError', { error: 'An error occurred during file upload.' });
     }
     next();
   });
